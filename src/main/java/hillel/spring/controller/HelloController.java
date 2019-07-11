@@ -14,6 +14,7 @@ public class HelloController {
         this.helloService = helloService;
     }
 
+
     @GetMapping("/greeting/{lang}")
     public String getHello(@PathVariable("lang") String lang) {
         return helloService.getHello(lang);

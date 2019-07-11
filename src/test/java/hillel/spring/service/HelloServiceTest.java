@@ -1,5 +1,7 @@
 package hillel.spring.service;
 
+import hillel.spring.Config;
+import hillel.spring.database.Database;
 import hillel.spring.repository.HelloRepository;
 import org.assertj.core.api.Assertions;
 import org.assertj.core.data.Percentage;
@@ -21,12 +23,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = {HelloService.class, HelloRepository.class})
+@SpringBootTest(classes = {HelloService.class, HelloRepository.class, Database.class, Config.class})
 public class HelloServiceTest {
 
 
     @Autowired
     private HelloService helloService;
+
 
     @Before
     public void setUp() throws Exception {
@@ -50,10 +53,9 @@ public class HelloServiceTest {
         assertThat(helloService.getHello("en")).isEqualToIgnoringCase("Hello");
         assertThat(helloService.getHello("fr")).isEqualToIgnoringCase("Bonjour");
         assertThat(helloService.getHello("it")).isEqualToIgnoringCase("Ciao");
-        assertThat(helloService.getHello("ua")).isEqualToIgnoringCase("Здоровеньки були");
 
         //Its terrible. I know
-        assertThat(helloService.getHello("^(?!.*?(?:en|fr|it)|ua).*$)"))
+        assertThat(helloService.getHello("^(?!.*?(?:en|fr|it)).*$)"))
                 .isEqualToIgnoringCase("No Such Language, Sorry");
 
 
@@ -64,9 +66,8 @@ public class HelloServiceTest {
 
         for (int i = 0; i < 100; i++) {
             assertThat(Arrays.asList(helloService.getRandomHello()))
-                    .isSubsetOf(Arrays.asList("Hello", "Bonjour", "Ciao", "Здоровеньки були"));
+                    .isSubsetOf(Arrays.asList("Hello", "Bonjour", "Ciao"));
         }
-
 
     }
 
@@ -80,7 +81,7 @@ public class HelloServiceTest {
     public void ensureThatGetRandomGreetingHasSmoothCoverage() {
 
         int numberOfCalls = 1_000_000;
-        int valueToExpect = numberOfCalls / helloService.getHelloRepository().getDatabase().getLanguagesHello().toArray().length;
+        int valueToExpect = numberOfCalls / helloService.getLanguagesHello().toArray().length;
 
         Map<String, Long> greetingsCountMap = IntStream.rangeClosed(1, numberOfCalls)
                 .mapToObj(i -> helloService.getRandomHello())

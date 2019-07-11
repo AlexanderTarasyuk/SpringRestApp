@@ -2,28 +2,28 @@ package hillel.spring.service;
 
 import hillel.spring.database.model.HelloModel;
 import hillel.spring.repository.HelloRepository;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Random;
+import java.util.Set;
 
 @Service
 public class HelloService {
 
-    public HelloRepository getHelloRepository() {
-        return helloRepository;
-    }
-
     private final HelloRepository helloRepository;
-    private final Random random = new Random();
+    private final Random random;
 
-    public HelloService(HelloRepository helloRepository) {
 
+    public HelloService(HelloRepository helloRepository, Random random)
+    {
         this.helloRepository = helloRepository;
+        this.random=random;
     }
+
 
     public String getHello(String language) {
-        return helloRepository.getDatabase().getLanguagesHello().stream()
+        return helloRepository.getLanguagesHello().stream()
                 .filter(model -> model.getLanguageName().trim().equals(language))
                 .findFirst()
                 .map(HelloModel::getGreeting)
@@ -32,8 +32,8 @@ public class HelloService {
 
     public String getRandomHello() {
 
-       int index = random.nextInt(helloRepository.getDatabase().getLanguagesHello().toArray().length);
-       HelloModel helloModel = (HelloModel) helloRepository.getDatabase().getLanguagesHello().toArray()[index];
+        int index = random.nextInt(getLanguagesHello().toArray().length);
+        HelloModel helloModel = (HelloModel) helloRepository.getLanguagesHello().toArray()[index];
 //
         // Why not
 //        List languages = List.of(helloRepository.getDatabase().getLanguagesHello().toArray());
@@ -45,4 +45,9 @@ public class HelloService {
     public String getNoSuchLanguageMessage() {
         return "No language is chosen";
     }
+
+    public Set<HelloModel> getLanguagesHello() {
+        return helloRepository.getLanguagesHello();
+    }
+
 }
