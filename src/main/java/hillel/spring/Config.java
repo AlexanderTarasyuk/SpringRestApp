@@ -1,10 +1,11 @@
-package hillel.spring.greeting;
+package hillel.spring;
 
 import hillel.spring.greeting.database.Database;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.util.Random;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Configuration
 public class Config {
@@ -18,4 +19,5 @@ public class Config {
     public Random getRandom() {
         return new Random();
     }
+
 }

@@ -1,6 +1,6 @@
 package hillel.spring.greeting.service;
 
-import hillel.spring.greeting.Config;
+import hillel.spring.Config;
 import hillel.spring.greeting.database.Database;
 import hillel.spring.greeting.repository.HelloRepository;
 import org.assertj.core.api.Assertions;
