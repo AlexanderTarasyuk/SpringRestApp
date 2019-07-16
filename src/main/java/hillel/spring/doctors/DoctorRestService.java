@@ -29,8 +29,8 @@ public class DoctorRestService {
         return doctorRestAPIRepo.findDoctorBySpecialization(specialization);
     }
 
-    public List<Doctor> findDoctorsByFirstLetter(String name) {
-        return doctorRestAPIRepo.findDoctorsByFirstLetter(name);
+    public List<Doctor> findDoctorsByFirstLetter(String letter) {
+        return doctorRestAPIRepo.findDoctorsByFirstLetter(letter);
     }
 
     public void updateDoctor(Integer id, Doctor doctor) {

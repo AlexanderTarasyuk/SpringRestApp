@@ -10,7 +10,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.websocket.server.PathParam;
 import java.util.List;
 import java.util.Optional;
 
@@ -36,14 +35,14 @@ public class DoctorsRestController {
         return mayBeDoctor.orElseThrow(DoctorIsNotFoundException::new);
     }
 
-    @GetMapping(value = "/doctors/", params = "specialization")
-    public List<Doctor> findDoctorBySpecialization(@PathParam("specialization") String specialization) {
+    @GetMapping("/doctors/specialization/")
+    public List<Doctor> findDoctorBySpecialization(@RequestParam String specialization) {
         return doctorRestService.findDoctorBySpecialization(specialization);
     }
 
-    @GetMapping(value = "/doctors", params = "letter")
-    public List<Doctor> findDoctorsByFirstLetter(@PathParam("letter") String letter) {
-        return doctorRestService.findDoctorsByFirstLetter(letter);
+    @GetMapping("/doctors/letter/")
+    public List<Doctor> findDoctorsByFirstLetter(@RequestParam("letter") String letter) {
+        return doctorRestService.findDoctorsByFirstLetter(letter.strip().toLowerCase());
     }
 
     @DeleteMapping("/doctors/{id}")
@@ -54,7 +53,6 @@ public class DoctorsRestController {
         doctorRestService.deleteDoctor(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
-
 
 
     @PostMapping("/doctors")

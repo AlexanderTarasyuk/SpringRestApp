@@ -54,9 +54,9 @@ public class DoctorRestRepository {
                 .collect(Collectors.toList());
     }
 
-    public List<Doctor> findDoctorsByFirstLetter(String name) {
+    public List<Doctor> findDoctorsByFirstLetter(String letter) {
         return doctors.stream()
-                .filter(doctorModel -> doctorModel.getName().startsWith(name))
+                .filter(doctorModel -> doctorModel.getName().toLowerCase().startsWith(letter))
                 .collect(Collectors.toList());
     }
 
