@@ -1,7 +1,6 @@
-package hillel.spring;
+package hillel.spring.greeting;
 
-import hillel.spring.database.Database;
-import org.springframework.boot.SpringBootConfiguration;
+import hillel.spring.greeting.database.Database;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 

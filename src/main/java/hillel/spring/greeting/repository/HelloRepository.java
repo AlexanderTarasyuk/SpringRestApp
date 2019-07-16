@@ -1,8 +1,7 @@
-package hillel.spring.repository;
+package hillel.spring.greeting.repository;
 
-import hillel.spring.database.Database;
-import hillel.spring.database.model.HelloModel;
-import org.springframework.beans.factory.annotation.Autowired;
+import hillel.spring.greeting.database.Database;
+import hillel.spring.greeting.database.model.HelloModel;
 import org.springframework.stereotype.Repository;
 
 import java.util.Set;

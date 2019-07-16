@@ -1,8 +1,8 @@
-package hillel.spring.service;
+package hillel.spring.greeting.service;
 
-import hillel.spring.Config;
-import hillel.spring.database.Database;
-import hillel.spring.repository.HelloRepository;
+import hillel.spring.greeting.Config;
+import hillel.spring.greeting.database.Database;
+import hillel.spring.greeting.repository.HelloRepository;
 import org.assertj.core.api.Assertions;
 import org.assertj.core.data.Percentage;
 import org.junit.After;

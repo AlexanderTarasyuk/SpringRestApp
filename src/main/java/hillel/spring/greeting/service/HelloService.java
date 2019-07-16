@@ -1,8 +1,7 @@
-package hillel.spring.service;
+package hillel.spring.greeting.service;
 
-import hillel.spring.database.model.HelloModel;
-import hillel.spring.repository.HelloRepository;
-import org.springframework.context.annotation.Bean;
+import hillel.spring.greeting.database.model.HelloModel;
+import hillel.spring.greeting.repository.HelloRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.Random;

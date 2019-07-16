@@ -1,6 +1,6 @@
-package hillel.spring.controller;
+package hillel.spring.greeting.controller;
 
-import hillel.spring.service.HelloService;
+import hillel.spring.greeting.service.HelloService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;

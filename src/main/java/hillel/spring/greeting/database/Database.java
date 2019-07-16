@@ -1,8 +1,6 @@
-package hillel.spring.database;
+package hillel.spring.greeting.database;
 
-import hillel.spring.database.model.HelloModel;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.annotation.Bean;
+import hillel.spring.greeting.database.model.HelloModel;
 import org.springframework.stereotype.Component;
 
 import java.util.HashSet;
