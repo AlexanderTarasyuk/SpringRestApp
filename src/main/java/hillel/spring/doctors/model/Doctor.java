@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 
 @Data
 @AllArgsConstructor
-public class DoctorModel {
+public class Doctor {
 
     private final Integer id;
     private final String name;
