@@ -1,5 +1,6 @@
 package hillel.spring;
 
+import hillel.spring.doctors.DatabaseDoctor;
 import hillel.spring.greeting.database.Database;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,6 +19,16 @@ public class Config {
     @Bean
     public Random getRandom() {
         return new Random();
+    }
+
+    @Bean
+    public AtomicInteger getAtomicInteger() {
+        return new AtomicInteger();
+    }
+
+    @Bean
+    public DatabaseDoctor getDatabaseDoctor() {
+        return new DatabaseDoctor();
     }
 
 }
