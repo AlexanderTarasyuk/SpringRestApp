@@ -32,6 +32,7 @@ public class DoctorRestRepository {
         id = doctors.size();
     }
 
+
     public List<Doctor> findAllDoctors() {
         return doctors;
     }
@@ -61,10 +62,8 @@ public class DoctorRestRepository {
     }
 
     public void updateDoctor(Integer id, Doctor doctor) {
-        doctors.stream()
-                .filter(doc -> doc.getId().equals(id))
-                .map(doctorModel -> new Doctor(doctorModel.getId(), doctorModel.getName(), doctorModel.getSpecialization()));
 
+        doctors.set(id-1, doctor);
     }
 
     public void deleteDoctor(Integer id) {

@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 
@@ -36,7 +37,7 @@ public class DoctorsRestController {
     }
 
     @GetMapping("/doctors/specialization/")
-    public List<Doctor> findDoctorBySpecialization(@RequestParam String specialization) {
+    public List<Doctor> findDoctorBySpecialization(@RequestParam("specialization") String specialization) {
         return doctorRestService.findDoctorBySpecialization(specialization);
     }
 
@@ -46,6 +47,7 @@ public class DoctorsRestController {
     }
 
     @DeleteMapping("/doctors/{id}")
+    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<?> deleteDoctor(@PathVariable Integer id) {
 
         doctorRestService.findDoctorByID(id).orElseThrow(DoctorIsNotFoundException::new);
@@ -61,13 +63,10 @@ public class DoctorsRestController {
             throw new IdIsPresentToCreateException();
         }
 
-        try {
             Integer id = doctorRestService.createDoctor(doctor);
 
-            return new ResponseEntity<>(new Doctor(id, doctor.getName(), doctor.getSpecialization()), HttpStatus.CREATED);
-        } catch (Exception e) {
-            throw new RuntimeException(" error");
-        }
+            return  ResponseEntity.created(URI.create("/doctors/"+id)).build();
+
     }
 
     @PutMapping("/doctors/{id}")
