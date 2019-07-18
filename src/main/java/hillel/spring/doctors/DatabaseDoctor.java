@@ -15,9 +15,6 @@ public class DatabaseDoctor {
     private List<Doctor> doctors;
     private AtomicInteger id;
 
-    public AtomicInteger getId() {
-        return id;
-    }
 
     public DatabaseDoctor() {
         doctors = new CopyOnWriteArrayList<>();
@@ -28,7 +25,11 @@ public class DatabaseDoctor {
         id = new AtomicInteger(doctors.size());
     }
 
-    public List<Doctor> getDoctors() {
+    AtomicInteger getId() {
+        return id;
+    }
+
+    List<Doctor> getDoctors() {
         return doctors;
     }
 
