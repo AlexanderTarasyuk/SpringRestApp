@@ -4,37 +4,34 @@ import hillel.spring.doctors.model.Doctor;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Component
 @Primary
 public class DatabaseDoctor {
 
-    private List<Doctor> doctors;
+    private Map<Integer, Doctor> intToDoctor;
     private AtomicInteger id;
 
 
     public DatabaseDoctor() {
-        doctors = new CopyOnWriteArrayList<>();
-        doctors.add(new Doctor(1, "Amosov", "cardiologist"));
-        doctors.add(new Doctor(2, "Pirogovskiy", "surgeon"));
-        doctors.add(new Doctor(3, "Dr. Sklifasovskiy", "surgeon"));
+        intToDoctor = new ConcurrentHashMap<>();
+        intToDoctor.put(1, new Doctor(1, "Amosov", "cardiologist"));
+        intToDoctor.put(2, new Doctor(2, "Pirogovskiy", "surgeon"));
+        intToDoctor.put(3, new Doctor(3, "Dr. Sklifasovskiy", "surgeon"));
 
-        id = new AtomicInteger(doctors.size());
+        id = new AtomicInteger(intToDoctor.size());
     }
 
     AtomicInteger getId() {
         return id;
     }
 
-    List<Doctor> getDoctors() {
-        return doctors;
+    Map<Integer, Doctor> getDoctors() {
+        return intToDoctor;
     }
 
-    public void setDoctors(List<Doctor> doctors) {
-        this.doctors = doctors;
-    }
 
 }

@@ -10,7 +10,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,9 +22,6 @@ public class DoctorsRestController {
     @GetMapping("/doctors")
     public List<Doctor> findAllDoctors() {
 
-//        return "hello";
-
-
         return doctorRestService.findAllDoctors();
     }
 
@@ -37,17 +33,17 @@ public class DoctorsRestController {
     }
 
     @GetMapping("/doctors/specialization/")
-    public List<Doctor> findDoctorBySpecialization(@RequestParam("specialization") String specialization) {
-        return doctorRestService.findDoctorBySpecialization(specialization);
+    public ResponseEntity<List<Doctor>> findDoctorBySpecialization(@RequestParam(value = "specialization", required = false) String specialization) {
+        return ResponseEntity.ok(doctorRestService.findDoctorBySpecialization(specialization));
     }
 
     @GetMapping("/doctors/letter/")
-    public List<Doctor> findDoctorsByFirstLetter(@RequestParam("letter") String letter) {
-        return doctorRestService.findDoctorsByFirstLetter(letter.strip().toLowerCase());
+    public ResponseEntity<List<Doctor>> findDoctorsByFirstLetter(@RequestParam(value = "letter") String letter) {
+        return ResponseEntity.ok(doctorRestService.findDoctorsByFirstLetter(letter.strip().toLowerCase()));
     }
 
     @DeleteMapping("/doctors/{id}")
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public ResponseEntity<?> deleteDoctor(@PathVariable Integer id) {
 
         doctorRestService.findDoctorByID(id).orElseThrow(DoctorIsNotFoundException::new);
@@ -63,9 +59,9 @@ public class DoctorsRestController {
             throw new IdIsPresentToCreateException();
         }
 
-            Integer id = doctorRestService.createDoctor(doctor);
+        Integer id = doctorRestService.createDoctor(doctor);
 
-            return  ResponseEntity.created(URI.create("/doctors/"+id)).build();
+        return ResponseEntity.status(HttpStatus.CREATED).body(doctorRestService.createDoctor(doctor));
 
     }
 
