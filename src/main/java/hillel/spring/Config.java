@@ -1,6 +1,9 @@
 package hillel.spring;
 
 import hillel.spring.doctors.DatabaseDoctor;
+import hillel.spring.doctors.dto.DoctorInputDto;
+import hillel.spring.doctors.dto.DoctorsDtoMapper;
+import hillel.spring.doctors.model.Doctor;
 import hillel.spring.greeting.database.Database;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

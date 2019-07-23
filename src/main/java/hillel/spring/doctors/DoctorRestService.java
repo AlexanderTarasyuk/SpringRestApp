@@ -6,6 +6,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -13,11 +15,14 @@ import java.util.Optional;
 public class DoctorRestService {
     private final DoctorRestRepository doctorRestAPIRepo;
 
-    public List<Doctor> findAllDoctors() {
-        return doctorRestAPIRepo.findAllDoctors();
+    public List<Doctor> findAllDoctors(Predicate<Doctor> predicate) {
+        return doctorRestAPIRepo.findAllDoctors()
+                .stream()
+                .filter(predicate)
+                .collect(Collectors.toList());
     }
 
-    public Integer createDoctor(Doctor doctor) {
+    public Doctor createDoctor(Doctor doctor) {
         return doctorRestAPIRepo.createDoctor(doctor);
     }
 
@@ -33,8 +38,8 @@ public class DoctorRestService {
         return doctorRestAPIRepo.findDoctorsByFirstLetter(letter);
     }
 
-    public void updateDoctor(Integer id, Doctor doctor) {
-        doctorRestAPIRepo.updateDoctor(id, doctor);
+    public void updateDoctor(Doctor doctor) {
+        doctorRestAPIRepo.updateDoctor( doctor);
     }
 
     public void deleteDoctor(Integer id) {

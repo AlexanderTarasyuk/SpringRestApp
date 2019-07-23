@@ -22,10 +22,12 @@ public class DoctorRestRepository {
         return new ArrayList<>(database.getDoctors().values());
     }
 
-    public Integer createDoctor(Doctor doctor) {
-        int id = database.getId().incrementAndGet();
-        database.getDoctors().put(id, new Doctor(id, doctor.getName(), doctor.getSpecialization()));
-        return id;
+    public Doctor createDoctor(Doctor doctor) {
+
+        Doctor created = doctor.toBuilder().id(database.getId().incrementAndGet()).build();
+
+        database.getDoctors().put(created.getId(), created);
+        return created;
     }
 
     public Optional<Doctor> findDoctorByID(Integer id) {
@@ -46,9 +48,9 @@ public class DoctorRestRepository {
                 .collect(Collectors.toList());
     }
 
-    public void updateDoctor(Integer id, Doctor doctor) {
+    public void updateDoctor(Doctor doctor) {
 
-        database.getDoctors().put(id - 1, doctor);
+        database.getDoctors().put(doctor.getId() - 1, doctor);
     }
 
     public void deleteDoctor(Integer id) {
