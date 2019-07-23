@@ -2,6 +2,8 @@ package hillel.spring.doctors;
 
 
 import hillel.spring.doctors.model.Doctor;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
@@ -10,13 +12,13 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Repository
+@AllArgsConstructor
+
 public class DoctorRestRepository {
 
-    private DatabaseDoctor database;
+    private final DatabaseDoctor database;
 
-    public DoctorRestRepository(DatabaseDoctor database) {
-        this.database = database;
-    }
+
 
     public List<Doctor> findAllDoctors() {
         return new ArrayList<>(database.getDoctors().values());
@@ -55,5 +57,11 @@ public class DoctorRestRepository {
 
     public void deleteDoctor(Integer id) {
         database.getDoctors().values().removeIf(doc -> doc.getId().equals(id));
+    }
+
+    public void deleteAllDoctors(){
+        database.getDoctors().clear();
+        database.getId().set(0);
+
     }
 }

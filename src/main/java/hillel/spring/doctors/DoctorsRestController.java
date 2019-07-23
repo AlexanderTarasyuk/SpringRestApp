@@ -29,7 +29,7 @@ public class DoctorsRestController {
 
     private final UriComponentsBuilder uriBuilder = UriComponentsBuilder.newInstance()
             .scheme("http")
-            .host("localhost8080:")
+            .host("localhost")
             .path("/doctors/{id}");
 
     @GetMapping("/doctors")
@@ -90,6 +90,11 @@ public class DoctorsRestController {
 
     private Predicate<Doctor> filterBySpecialization(String specialization) {
         return doctor -> doctor.getSpecialization().equals(specialization);
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public void noSuchDoctor(DoctorIsNotFoundException ex){
     }
 
 
