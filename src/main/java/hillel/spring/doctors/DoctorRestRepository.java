@@ -50,7 +50,7 @@ public class DoctorRestRepository {
 
     public void updateDoctor(Doctor doctor) {
 
-        database.getDoctors().put(doctor.getId() - 1, doctor);
+        database.getDoctors().put(doctor.getId(), doctor);
     }
 
     public void deleteDoctor(Integer id) {
