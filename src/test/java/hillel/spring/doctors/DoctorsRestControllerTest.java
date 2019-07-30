@@ -8,6 +8,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.util.ResourceUtils;
@@ -17,8 +18,11 @@ import java.nio.file.Files;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.*;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -27,20 +31,22 @@ public class DoctorsRestControllerTest {
 
 
     @Autowired
-    MockMvc mockMvc;
+     MockMvc mockMvc;
 
     @Autowired
-    DoctorRestRepository repository;
+     DoctorRestRepository repository;
 
     @Before
     public void init() {
+        repository.deleteAllDoctors();
+
         repository.createDoctor(new Doctor(1, "Amosov", "cardiologist"));
         repository.createDoctor(new Doctor(2, "Pirogovskiy", "surgeon"));
         repository.createDoctor(new Doctor(3, "Sklifasovskiy", "surgeon"));
     }
 
     @After
-    public void tearDown() throws Exception {
+    public void cleanUp() {
         repository.deleteAllDoctors();
     }
 
@@ -83,6 +89,9 @@ public class DoctorsRestControllerTest {
         mockMvc.perform(get("/doctors/{id}", 1))
                 .andExpect(jsonPath("$.name", is("Amosov")))
                 .andExpect(jsonPath("$.specialization", is("cardiologist")));
+
+
+
     }
 
     @Test
@@ -143,6 +152,8 @@ public class DoctorsRestControllerTest {
         mockMvc.perform(delete("/doctors/{id}", 2))
                 .andExpect(status().isNoContent());
         assertThat(repository.findDoctorByID(2)).isEmpty();
+
+
     }
 
     @Test
