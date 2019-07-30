@@ -18,9 +18,9 @@ public class DatabaseDoctor {
 
     public DatabaseDoctor() {
         intToDoctor = new ConcurrentHashMap<>();
-//        intToDoctor.put(1, new Doctor(1, "Amosov", "cardiologist"));
-//        intToDoctor.put(2, new Doctor(2, "Pirogovskiy", "surgeon"));
-//        intToDoctor.put(3, new Doctor(3, "Dr. Sklifasovskiy", "surgeon"));
+        intToDoctor.put(1, new Doctor(1, "Amosov", "cardiologist"));
+        intToDoctor.put(2, new Doctor(2, "Pirogovskiy", "surgeon"));
+        intToDoctor.put(3, new Doctor(3, "Dr. Sklifasovskiy", "surgeon"));
 
         id = new AtomicInteger(intToDoctor.size());
     }
