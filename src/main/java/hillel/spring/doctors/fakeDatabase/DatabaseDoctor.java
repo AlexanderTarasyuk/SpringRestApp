@@ -1,4 +1,4 @@
-package hillel.spring.doctors;
+package hillel.spring.doctors.fakeDatabase;
 
 import hillel.spring.doctors.model.Doctor;
 import org.springframework.context.annotation.Primary;
