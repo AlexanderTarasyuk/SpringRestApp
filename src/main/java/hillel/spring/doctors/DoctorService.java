@@ -68,21 +68,6 @@ public class DoctorService {
             throw new InvalidSpecializationException();
     }
 
-//    public List<Doctor> findAll(Optional<String> letter, Optional<String> specialization) {
-//        Optional<Predicate<Doctor>> maybeNamePredicate = letter.map(this::filterByName);
-//        Optional<Predicate<Doctor>> maybeSpecializationPredicate = specialization.map(this::filterBySpecialization);
-//
-//
-//        Predicate<Doctor> predicate = Stream.of(maybeNamePredicate, maybeSpecializationPredicate)
-//                .flatMap(Optional::stream)
-//                .reduce(Predicate::and)
-//                .orElse(doctor -> true);
-//
-//        return doctorRepository.findAll()
-//                .stream()
-//                .filter(predicate)
-//                .collect(Collectors.toList());
-//    }
 
     private Predicate<Doctor> filterByName(String letter) {
         return doctor -> doctor.getName().toLowerCase().startsWith(letter.toLowerCase());
