@@ -1,1 +1,23 @@
-doctors.specializations: surgeon, cardiologist
+server.port: 80
+pet-clinic:
+  host-name: my-pet.com
+  name: Aibolit
+  working-hours:
+    start: 8AM
+    end: 5PM
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/postgres
+    username: postgres
+    password: postgres
+  h2:
+    console:
+      enabled: true
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: create
+logging:
+  level:
+    sql: debug

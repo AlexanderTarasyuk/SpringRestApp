@@ -65,7 +65,7 @@ public class DoctorService {
 
     private void checkSpecialization(Doctor doctor) {
         if (!specializations.contains(doctor.getSpecialization()))
-            throw new InvalidSpecializationException();
+            throw new InvalidSpecializationException("Wrong specilization of doctor " + doctor.getSpecialization()  );
     }
 
 
