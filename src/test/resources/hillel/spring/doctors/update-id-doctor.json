@@ -1,5 +1,7 @@
 {
   "id": 3000,
   "name": "House",
-  "specialization": "surgeon"
+  "specialization": [
+    "surgeon"
+  ]
 }

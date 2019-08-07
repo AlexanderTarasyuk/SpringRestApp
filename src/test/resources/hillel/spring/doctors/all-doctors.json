@@ -2,16 +2,22 @@
   {
     "id": 1,
     "name": "Amosov",
-    "specialization": "cardiologist"
+    "specialization": [
+      "cardiologist"
+    ]
   },
   {
     "id": 2,
     "name": "Pirogovskiy",
-    "specialization": "surgeon"
+    "specialization": [
+      "surgeon"
+    ]
   },
   {
     "id": 3,
     "name": "Sklifasovskiy",
-    "specialization": "surgeon"
+    "specialization": [
+      "surgeon"
+    ]
   }
 ]

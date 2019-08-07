@@ -1,4 +1,6 @@
 {
   "name": "House",
-  "specialization": "driver"
+  "specialization": [
+    "driver"
+  ]
 }

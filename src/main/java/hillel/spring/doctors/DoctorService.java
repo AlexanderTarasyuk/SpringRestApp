@@ -2,14 +2,20 @@ package hillel.spring.doctors;
 
 import hillel.spring.doctors.exceptions.InvalidSpecializationException;
 import hillel.spring.doctors.exceptions.NoSuchDoctorException;
+import hillel.spring.doctors.exceptions.ScheduleIsAlreadyBusy;
+import hillel.spring.doctors.model.Appointment;
 import hillel.spring.doctors.model.Doctor;
+import hillel.spring.pet.NoSuchPetException;
+import hillel.spring.pet.Pet;
+import hillel.spring.pet.PetService;
+import lombok.val;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 
@@ -17,10 +23,14 @@ public class DoctorService {
     private final DoctorRepository doctorRepository;
     private final List<String> specializations;
 
+    private final PetService petService;
+
     public DoctorService(@Value("${doctors.specializations}") String[] specializations,
-                         DoctorRepository doctorRepository) {
+                         DoctorRepository doctorRepository,
+                         PetService petService) {
         this.specializations=List.of(specializations);
         this.doctorRepository = doctorRepository;
+        this.petService = petService;
     }
 
 
@@ -63,9 +73,45 @@ public class DoctorService {
         return doctorRepository.findAll();
     }
 
+
+    public Appointment findOrCreateSchedule(Integer doctorId, LocalDate date) {
+        val mayBeDoctor = findById(doctorId);
+        Doctor doctor = mayBeDoctor.orElseThrow(NoSuchDoctorException::new);
+
+        return doctor.getScheduleToDate().computeIfAbsent(date, k -> new Appointment());
+    }
+
+    public void schedulePetToDoctor(Integer doctorId, LocalDate date, Integer hour, Integer petId) {
+        val mayBeDoctor = findById(doctorId);
+        Doctor doctor = mayBeDoctor.orElseThrow(NoSuchDoctorException::new);
+        Appointment appointment = doctor.getScheduleToDate().computeIfAbsent(date, k -> new Appointment());
+        Optional<Pet> maybePet = petService.findById(petId);
+        if (maybePet.isEmpty()) {
+            throw new NoSuchPetException();
+        } else {
+            putToSchedule(appointment, hour, petId);
+            doctorRepository.save(doctor);
+        }
+    }
+
+
+    public void putToSchedule(Appointment appointment, Integer hour, Integer petId) {
+
+        if (appointment.getHourToPetId().containsKey(hour)) {
+            throw new ScheduleIsAlreadyBusy(hour);
+        } else {
+            appointment.getHourToPetId().put(hour, petId);
+        }
+    }
+
     private void checkSpecialization(Doctor doctor) {
-        if (!specializations.contains(doctor.getSpecialization()))
-            throw new InvalidSpecializationException("Wrong specilization of doctor " + doctor.getSpecialization()  );
+        Optional<String> maybeInvalid = doctor.getSpecialization().stream()
+                .filter(s -> !specializations.contains(s))
+                .findFirst();
+
+        if (maybeInvalid.isPresent()) {
+            throw new InvalidSpecializationException(maybeInvalid.get());
+        }
     }
 
 
@@ -76,4 +122,6 @@ public class DoctorService {
     private Predicate<Doctor> filterBySpecialization(String specialization) {
         return doctor -> doctor.getSpecialization().equals(specialization);
     }
+
+
 }
