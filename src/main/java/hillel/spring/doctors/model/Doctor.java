@@ -5,6 +5,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -26,5 +27,11 @@ public class Doctor {
         this.id = id;
         this.name = name;
         this.specialization = specialization;
+    }
+
+    public Doctor(Integer id, String name, String... specialization) {
+        this.id = id;
+        this.name = name;
+        this.specialization = Arrays.asList(specialization);
     }
 }
