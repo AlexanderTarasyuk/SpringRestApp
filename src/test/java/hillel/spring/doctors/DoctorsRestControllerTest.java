@@ -10,8 +10,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.Rollback;
@@ -33,14 +31,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 @RunWith(SpringRunner.class)
-@SpringBootTest
-@AutoConfigureMockMvc
+@TestRunner
 public class DoctorsRestControllerTest {
-
 
     @Autowired
     MockMvc mockMvc;
-
     @Autowired
     DoctorRepository doctorRepository;
     @Autowired
@@ -56,11 +51,15 @@ public class DoctorsRestControllerTest {
         doctorRepository.save(new Doctor(1, "Amosov", Collections.singletonList("cardiologist")));
         doctorRepository.save(new Doctor(2, "Pirogovskiy", Collections.singletonList("surgeon")));
         doctorRepository.save(new Doctor(3, "Sklifasovskiy", Collections.singletonList("surgeon")));
+
+        petRepository.save(new Pet(null, null, "Tom", "Cat", 2, "Vasya"));
+        petRepository.save(new Pet(null, null, "Jerry", "Mouse", 1, "Vasya"));
     }
 
     @After
     public void cleanUp() {
         doctorRepository.deleteAll();
+        petRepository.deleteAll();
     }
 
     @Test
@@ -68,7 +67,7 @@ public class DoctorsRestControllerTest {
 
         mockMvc.perform(get("/doctors/{id}", 1))
                 .andExpect(jsonPath("$.name", is("Amosov")))
-                .andExpect(jsonPath("$.specializations[]", is("cardiologist")));
+                .andExpect(jsonPath("$.specializations[0]", is("cardiologist")));
 
 
     }
@@ -93,7 +92,6 @@ public class DoctorsRestControllerTest {
     @Test
     public void shouldFindAllDoctors() throws Exception {
 
-
         mockMvc.perform(get("/doctors"))
                 .andExpect(status().isOk())
                 .andExpect(content().json(fromResource("hillel/spring/doctors/all-doctors.json"), false))
@@ -109,7 +107,6 @@ public class DoctorsRestControllerTest {
 
     @Test
     public void shouldNotFindDoctorById() throws Exception {
-
 
         mockMvc.perform(get("/doctors/{id}", 5))
                 .andExpect(status().isNotFound());
@@ -153,7 +150,6 @@ public class DoctorsRestControllerTest {
                 .andExpect(jsonPath("$", hasSize(1)))
                 .andExpect(jsonPath("$[0].name", is("Amosov")))
                 .andExpect(jsonPath("$[0].specializations[0]", is("cardiologist")));
-
     }
 
 
@@ -202,14 +198,12 @@ public class DoctorsRestControllerTest {
     @Test
     public void shouldSchedulePet() throws Exception {
         Integer doctorId = doctorRepository.save(new Doctor(1, "Ivan Ivanov", Collections.singletonList("surgeon"))).getId();
-        Integer petId = petRepository.save(new Pet(null, "Tom", "Cat", 2, "Ivan")).getId();
+        Integer petId = petRepository.save(new Pet(null, null, "Tom", "Cat", 2, "Ivan")).getId();
 
         mockMvc.perform(post("/doctors/{id}/schedule/2010-01-01/10", doctorId)
                 .contentType("application/json")
-                .content("{ \"petId\" : \"" + petId + "\"}")
-        )
-                .andExpect(status().isOk())
-        ;
+                .content("{ \"petId\" : \"" + petId + "\"}"))
+                .andExpect(status().isOk());
 
         Doctor doctor = doctorRepository.findById(doctorId).get();
         Appointment appointment = doctor.getScheduleToDate().get(LocalDate.of(2010, 01, 01));
@@ -222,7 +216,7 @@ public class DoctorsRestControllerTest {
     @Test
     public void shouldFindAppointmentInTheSchedule() throws Exception {
         Integer doctorId = doctorRepository.save(new Doctor(1, "Ivan Ivanov", Collections.singletonList("surgeon"))).getId();
-        Integer petId = petRepository.save(new Pet(null, "Tom", "Cat", 2, "Vasya")).getId();
+        Integer petId = 1;
         Doctor doctor = doctorRepository.findById(doctorId).get();
         LocalDate localDate = LocalDate.of(2010, 01, 01);
         Appointment appointment = new Appointment();
@@ -237,12 +231,11 @@ public class DoctorsRestControllerTest {
     @Test
     public void shouldNotAppointPetToWrongDoctor() throws Exception {
         Integer doctorId = doctorRepository.save(new Doctor(1, "Ivan Ivanov", Collections.singletonList("cardiologist"))).getId();
-        Integer petId = petRepository.save(new Pet(null, "Tom", "Cat", 2, "Vasya")).getId();
+        Integer petId = petRepository.save(new Pet(null, null, "Tom", "Cat", 2, "Vasya")).getId();
 
         mockMvc.perform(post("/doctors/{id}/schedule/2010-01-01/10", doctorId + 100)
                 .contentType("application/json")
-                .content("{ \"petId\" : \"" + petId + "\"}")
-        )
+                .content("{ \"petId\" : \"" + petId + "\"}"))
                 .andExpect(status().isNotFound())
         ;
     }
@@ -251,12 +244,11 @@ public class DoctorsRestControllerTest {
     @Test
     public void shouldNotAppointPetToWrongSchedule() throws Exception {
         Integer doctorId = doctorRepository.save(new Doctor(1, "Ivan Ivanov", Collections.singletonList("surgeon"))).getId();
-        Integer petId = petRepository.save(new Pet(null, "Tom", "Cat", 2, "Vasya")).getId();
+        Integer petId = petRepository.save(new Pet(null, null, "Tom", "Cat", 2, "Vasya")).getId();
 
         mockMvc.perform(post("/doctors/{id}/schedule/2010-01-01/1000", doctorId)
                 .contentType("application/json")
-                .content("{ \"petId\" : \"" + petId + "\"}")
-        )
+                .content("{ \"petId\" : \"" + petId + "\"}"))
                 .andExpect(status().isBadRequest())
         ;
     }
@@ -264,22 +256,18 @@ public class DoctorsRestControllerTest {
     @Test
     public void shouldNotAppointPetIfScheduleIsBusy() throws Exception {
         Integer doctorId = doctorRepository.save(new Doctor(1, "Ivan Ivanov", Collections.singletonList("surgeon"))).getId();
-        Integer catId = petRepository.save(new Pet(null, "Tom", "Cat", 2, "Vasya")).getId();
-        Integer mouseId = petRepository.save(new Pet(null, "Jerry", "Mouse", 1, "Vasya")).getId();
+        Integer catId = 1;
+        Integer mouseId = 2;
 
         mockMvc.perform(post("/doctors/{id}/schedule/2010-01-01/14", doctorId)
                 .contentType("application/json")
-                .content("{ \"petId\" : \"" + catId + "\"}")
-        )
-                .andExpect(status().isOk())
-        ;
+                .content("{ \"petId\" : \"" + catId + "\"}"))
+                .andExpect(status().isOk());
 
         mockMvc.perform(post("/doctors/{id}/schedule/2010-01-01/14", doctorId)
                 .contentType("application/json")
-                .content("{ \"petId\" : \"" + mouseId + "\"}")
-        )
-                .andExpect(status().isBadRequest())
-        ;
+                .content("{ \"petId\" : \"" + mouseId + "\"}"))
+                .andExpect(status().isBadRequest());
 
         Doctor doctor = doctorRepository.findById(doctorId).get();
         Appointment appointment = doctor.getScheduleToDate().get(LocalDate.of(2010, 01, 01));
@@ -288,6 +276,57 @@ public class DoctorsRestControllerTest {
         assertThat(appointment.getHourToPetId().containsValue(catId)).isTrue();
     }
 
+    @Test
+    public void shouldMoveAppointmentIfDoctorsAndscheduleArePresent() throws Exception {
+
+        Integer petId = 1;
+        Doctor doctorFromWhomWeGetAppointment = doctorRepository.findById(1).get();
+        Doctor doctorToWhomWeGiveAppointment = doctorRepository.findById(2).get();
+        LocalDate localDate = LocalDate.of(2010, 01, 01);
+        Appointment appointment = new Appointment();
+        doctorService.putToSchedule(appointment, 12, petId);
+        doctorFromWhomWeGetAppointment.getScheduleToDate().put(localDate, appointment);
+        doctorRepository.save(doctorFromWhomWeGetAppointment);
+
+        mockMvc.perform(post("/doctors/move-schedule/2010-01-01/{doctorIdFrom}/{doctorIdTo}",
+                doctorFromWhomWeGetAppointment.getId(),
+                doctorToWhomWeGiveAppointment.getId()))
+                .andExpect(status().isOk());
+
+        assertThat(doctorToWhomWeGiveAppointment.getScheduleToDate().get(localDate).getHourToPetId()
+                .equals(doctorFromWhomWeGetAppointment.getScheduleToDate().get(localDate).getHourToPetId())).isTrue();
+        doctorFromWhomWeGetAppointment = doctorRepository.findById(doctorFromWhomWeGetAppointment.getId()).get();
+        assertThat(doctorFromWhomWeGetAppointment.getScheduleToDate().get(localDate).getHourToPetId()).isEmpty();
+    }
+
+    @Test
+    public void shouldNotMoveAppointmentIfFreeTimeIsAbsent() throws Exception {
+        Doctor doctorFromWhomWeGetAppointment = doctorRepository.findById(1).get();
+        Doctor doctorToWhomWeGiveAppointment = doctorRepository.findById(2).get();
+        Integer petId1 = 1;
+        Integer petId2 = 2;
+
+        LocalDate localDate = LocalDate.of(2010, 01, 01);
+
+        Appointment appointmentFromDoctorWhomWeGetAppointment = new Appointment();
+        doctorService.putToSchedule(appointmentFromDoctorWhomWeGetAppointment, 12, petId1);
+        doctorFromWhomWeGetAppointment.getScheduleToDate().put(localDate, appointmentFromDoctorWhomWeGetAppointment);
+        doctorRepository.save(doctorFromWhomWeGetAppointment);
+
+        Appointment appointmentToDoctorWhomWeGetAppointment = new Appointment();
+        doctorService.putToSchedule(appointmentToDoctorWhomWeGetAppointment, 12, petId2);
+        doctorToWhomWeGiveAppointment.getScheduleToDate().put(localDate, appointmentToDoctorWhomWeGetAppointment);
+        doctorToWhomWeGiveAppointment = doctorRepository.save(doctorToWhomWeGiveAppointment);
+        appointmentToDoctorWhomWeGetAppointment = doctorToWhomWeGiveAppointment.getScheduleToDate().get(localDate);
+
+        mockMvc.perform(post("/doctors/move-schedule/2010-01-01/{doctorIdFrom}/{doctorIdTo}",
+                doctorFromWhomWeGetAppointment.getId(),
+                doctorToWhomWeGiveAppointment.getId()))
+                .andExpect(status().isBadRequest());
+        doctorToWhomWeGiveAppointment = doctorRepository.findById(doctorToWhomWeGiveAppointment.getId()).get();
+        assertThat(doctorToWhomWeGiveAppointment.getScheduleToDate().get(localDate).equals(appointmentToDoctorWhomWeGetAppointment)).isTrue();
+        assertThat(doctorFromWhomWeGetAppointment.getScheduleToDate().get(localDate).equals(appointmentFromDoctorWhomWeGetAppointment)).isTrue();
+    }
 
     public String fromResource(String path) {
         try {

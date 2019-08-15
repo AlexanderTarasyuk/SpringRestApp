@@ -1,3 +1,11 @@
 build
 out
 .idea
+HELP.md
+.gradle
+!gradle/wrapper/gradle-wrapper.jar
+
+*.iws
+*.iml
+*.ipr
+out/

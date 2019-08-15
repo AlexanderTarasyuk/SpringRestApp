@@ -12,6 +12,8 @@ public class Appointment {
     @Id
     @GeneratedValue
     private Integer id;
+    @Version
+    private Integer version;
     @ElementCollection(fetch = FetchType.EAGER)
     private Map<Integer, Integer> hourToPetId = new HashMap<>();
 }

@@ -1,5 +1,6 @@
 package hillel.spring.doctors;
 
+import hillel.spring.doctors.exceptions.AppointmentIsBusy;
 import hillel.spring.doctors.exceptions.InvalidSpecializationException;
 import hillel.spring.doctors.exceptions.NoSuchDoctorException;
 import hillel.spring.doctors.exceptions.ScheduleIsAlreadyBusy;
@@ -11,6 +12,7 @@ import hillel.spring.pet.PetService;
 import lombok.val;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -82,7 +84,7 @@ public class DoctorService {
     }
 
     public void schedulePetToDoctor(Integer doctorId, LocalDate date, Integer hour, Integer petId) {
-        val mayBeDoctor = findById(doctorId);
+        Optional<Doctor> mayBeDoctor = findById(doctorId);
         Doctor doctor = mayBeDoctor.orElseThrow(NoSuchDoctorException::new);
         Appointment appointment = doctor.getScheduleToDate().computeIfAbsent(date, k -> new Appointment());
         Optional<Pet> maybePet = petService.findById(petId);
@@ -124,4 +126,34 @@ public class DoctorService {
     }
 
 
+    @Transactional
+    public void moveAppointment(LocalDate date, Integer fromDoctorId, Integer toDoctorId) {
+        Optional<Doctor> fromMaybeDoctor = doctorRepository.findById(fromDoctorId);
+        if (fromMaybeDoctor.isEmpty())
+            throw new NoSuchDoctorException(fromDoctorId);
+        Optional<Doctor> toMaybeDoctor = doctorRepository.findById(toDoctorId);
+        if (toMaybeDoctor.isEmpty())
+            throw new NoSuchDoctorException(toDoctorId);
+        Doctor fromDoctor = fromMaybeDoctor.get();
+        Doctor toDoctor = toMaybeDoctor.get();
+
+        Appointment scheduleFrom = fromDoctor.getScheduleToDate().get(date);
+        Appointment scheduleTo = findOrCreateSchedule(toDoctor.getId(), date);
+
+        Optional<Integer> mayBeBusyHour = scheduleFrom.getHourToPetId()
+                .keySet()
+                .stream()
+                .filter(hour -> scheduleTo.getHourToPetId().containsKey(hour))
+                .findFirst();
+
+        if (mayBeBusyHour.isPresent()) {
+            throw new AppointmentIsBusy(mayBeBusyHour.get());
+        }
+
+        scheduleTo.getHourToPetId().putAll(scheduleFrom.getHourToPetId());
+        scheduleFrom.getHourToPetId().clear();
+
+        doctorRepository.save(toDoctor);
+        doctorRepository.save(fromDoctor);
+    }
 }
