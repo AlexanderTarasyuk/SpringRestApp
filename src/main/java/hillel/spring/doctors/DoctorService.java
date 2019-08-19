@@ -30,7 +30,7 @@ public class DoctorService {
     public DoctorService(@Value("${doctors.specializations}") String[] specializations,
                          DoctorRepository doctorRepository,
                          PetService petService) {
-        this.specializations=List.of(specializations);
+        this.specializations = List.of(specializations);
         this.doctorRepository = doctorRepository;
         this.petService = petService;
     }
@@ -41,11 +41,11 @@ public class DoctorService {
         return doctorRepository.save(doctor);
     }
 
-    public Optional<Doctor> findById(Integer id){
+    public Optional<Doctor> findById(Integer id) {
         return doctorRepository.findById(id);
     }
 
-    public void update(Doctor doctor)  {
+    public void update(Doctor doctor) {
         checkSpecialization(doctor);
         if (doctorRepository.existsById(doctor.getId()))
             doctorRepository.save(doctor);
@@ -62,14 +62,14 @@ public class DoctorService {
     }
 
 
-    public List<Doctor> findAll(Optional<String> letter, Optional<String> specialization){
-        if (specialization.isPresent() && letter.isPresent()){
+    public List<Doctor> findAll(Optional<String> letter, Optional<String> specialization) {
+        if (specialization.isPresent() && letter.isPresent()) {
             return doctorRepository.findBySpecializationInAndNameIgnoreCaseStartingWith(specialization.get(), letter.get());
         }
-        if (specialization.isPresent()){
+        if (specialization.isPresent()) {
             return doctorRepository.findBySpecializationIn(specialization.get());
         }
-        if (letter.isPresent()){
+        if (letter.isPresent()) {
             return doctorRepository.findByNameIgnoreCaseStartingWith(letter.get());
         }
         return doctorRepository.findAll();
@@ -83,6 +83,7 @@ public class DoctorService {
         return doctor.getScheduleToDate().computeIfAbsent(date, k -> new Appointment());
     }
 
+    @Transactional
     public void schedulePetToDoctor(Integer doctorId, LocalDate date, Integer hour, Integer petId) {
         Optional<Doctor> mayBeDoctor = findById(doctorId);
         Doctor doctor = mayBeDoctor.orElseThrow(NoSuchDoctorException::new);

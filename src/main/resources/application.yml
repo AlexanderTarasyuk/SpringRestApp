@@ -11,6 +11,9 @@ doctors:
 
 spring:
 
+  flyway:
+    baselineOnMigrate: true
+
   jpa:
     open-in-view: false
     hibernate:
@@ -30,6 +33,8 @@ spring:
     password: postgres
 hibernate:
   dialect: org.hibernate.dialect.PostgreSQLDialect
+
+
 
 
 

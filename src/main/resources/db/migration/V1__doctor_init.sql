@@ -13,9 +13,16 @@ create table doctor_specialization(
    doctor_id integer,
    specialization varchar(255)
 );
-
+create table pet (
+    id serial primary  key,
+    age integer,
+    breed varchar(255),
+    name varchar(255),
+    owner  varchar(255)
+);
 create table appointment(
    id serial primary key
+   version integer
 );
 
 create table appointment_hour_to_pet_id(
