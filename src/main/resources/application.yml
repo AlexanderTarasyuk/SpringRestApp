@@ -17,7 +17,7 @@ spring:
   jpa:
     open-in-view: false
     hibernate:
-      ddl-auto: validate
+      ddl-auto: create
       database-platform: org.hibernate.dialect.PostgreSQLDialect
     properties:
       hibernate:
@@ -28,7 +28,7 @@ spring:
           use_jdbc_metadata_defaults: false
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost/postgres
+    url: jdbc:postgresql://localhost:5432/postgres
     username: postgres
     password: postgres
 hibernate:

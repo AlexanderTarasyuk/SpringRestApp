@@ -10,7 +10,9 @@ import hillel.spring.pet.NoSuchPetException;
 import hillel.spring.pet.Pet;
 import hillel.spring.pet.PetService;
 import lombok.val;
+import org.hibernate.StaleObjectStateException;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -84,6 +86,7 @@ public class DoctorService {
     }
 
     @Transactional
+    @Retryable(StaleObjectStateException.class)
     public void schedulePetToDoctor(Integer doctorId, LocalDate date, Integer hour, Integer petId) {
         Optional<Doctor> mayBeDoctor = findById(doctorId);
         Doctor doctor = mayBeDoctor.orElseThrow(NoSuchDoctorException::new);
@@ -108,13 +111,13 @@ public class DoctorService {
     }
 
     private void checkSpecialization(Doctor doctor) {
-        Optional<String> maybeInvalid = doctor.getSpecialization().stream()
-                .filter(s -> !specializations.contains(s))
-                .findFirst();
-
-        if (maybeInvalid.isPresent()) {
-            throw new InvalidSpecializationException(maybeInvalid.get());
-        }
+//        Optional<String> maybeInvalid = doctor.getSpecialization().stream()
+//                .filter(s -> !specializations.contains(s))
+//                .findFirst();
+//
+//        if (maybeInvalid.isPresent()) {
+//            throw new InvalidSpecializationException(maybeInvalid.get());
+//        }
     }
 
 

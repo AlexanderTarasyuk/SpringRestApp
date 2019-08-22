@@ -78,7 +78,7 @@ public class DoctorsRestController {
 
     //post methods
     @PostMapping("/doctors/{doctorId}/schedule/{date}/{hour}")
-    @Retryable(StaleObjectStateException.class)
+
     public ResponseEntity<?> schedulePetToDoctor(@PathVariable Integer doctorId,
                                                  @PathVariable
                                                  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,

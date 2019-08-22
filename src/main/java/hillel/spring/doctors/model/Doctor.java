@@ -5,6 +5,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -16,22 +17,24 @@ public class Doctor {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
+    @Version
+    private Integer versionId;
     private String name;
+
     @ElementCollection(fetch = FetchType.EAGER)
     private List<String> specialization;
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private Map<LocalDate, Appointment> scheduleToDate;
 
-    public Doctor(Integer id, String name, List<String> specialization) {
+
+
+    public Doctor(Integer id, String name, String...specialization) {
         this.id = id;
         this.name = name;
-        this.specialization = specialization;
+        this.specialization =  Arrays.asList(specialization);
     }
 
-    public Doctor(Integer id, String name, String... specialization) {
-        this.id = id;
-        this.name = name;
-        this.specialization = Arrays.asList(specialization);
-    }
+
+
 }

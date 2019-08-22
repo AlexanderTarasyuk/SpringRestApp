@@ -54,12 +54,12 @@ public class DoctorsRestControllerTest {
     @Transactional
     public void init() {
 
-        doctorRepository.save(new Doctor(1, "Amosov", Collections.singletonList("cardiologist")));
-        doctorRepository.save(new Doctor(2, "Pirogovskiy", Collections.singletonList("surgeon")));
-        doctorRepository.save(new Doctor(3, "Sklifasovskiy", Collections.singletonList("surgeon")));
+        doctorRepository.save(new Doctor(1, "Amosov","cardiologist"));
+        doctorRepository.save(new Doctor(2, "Pirogovskiy", "surgeon"));
+        doctorRepository.save(new Doctor(3, "Sklifasovskiy", "surgeon"));
 
-        petRepository.save(new Pet(null, null, "Tom", "Cat", 2, "Vasya"));
-        petRepository.save(new Pet(null, null, "Jerry", "Mouse", 1, "Vasya"));
+        petRepository.save(new Pet(null,  "Tom", "Cat", 2, "Vasya"));
+        petRepository.save(new Pet(null, "Jerry", "Mouse", 1, "Vasya"));
     }
 
     @After
@@ -203,8 +203,8 @@ public class DoctorsRestControllerTest {
 
     @Test
     public void shouldSchedulePet() throws Exception {
-        Integer doctorId = doctorRepository.save(new Doctor(1, "Ivan Ivanov", Collections.singletonList("surgeon"))).getId();
-        Integer petId = petRepository.save(new Pet(null, null, "Tom", "Cat", 2, "Ivan")).getId();
+        Integer doctorId = doctorRepository.save(new Doctor(1, "Ivan Ivanov", "surgeon")).getId();
+        Integer petId = petRepository.save(new Pet(null,  "Tom", "Cat", 2, "Ivan")).getId();
 
         mockMvc.perform(post("/doctors/{id}/schedule/2010-01-01/10", doctorId)
                 .contentType("application/json")
@@ -221,7 +221,7 @@ public class DoctorsRestControllerTest {
 
     @Test
     public void shouldFindAppointmentInTheSchedule() throws Exception {
-        Integer doctorId = doctorRepository.save(new Doctor(1, "Ivan Ivanov", Collections.singletonList("surgeon"))).getId();
+        Integer doctorId = doctorRepository.save(new Doctor(1, "Ivan Ivanov", "surgeon")).getId();
         Integer petId = 1;
         Doctor doctor = doctorRepository.findById(doctorId).get();
         LocalDate localDate = LocalDate.of(2010, 01, 01);
@@ -236,8 +236,8 @@ public class DoctorsRestControllerTest {
 
     @Test
     public void shouldNotAppointPetToWrongDoctor() throws Exception {
-        Integer doctorId = doctorRepository.save(new Doctor(1, "Ivan Ivanov", Collections.singletonList("cardiologist"))).getId();
-        Integer petId = petRepository.save(new Pet(null, null, "Tom", "Cat", 2, "Vasya")).getId();
+        Integer doctorId = doctorRepository.save(new Doctor(1, "Ivan Ivanov", "cardiologist")).getId();
+        Integer petId = petRepository.save(new Pet(null, "Tom", "Cat", 2, "Vasya")).getId();
 
         mockMvc.perform(post("/doctors/{id}/schedule/2010-01-01/10", doctorId + 100)
                 .contentType("application/json")
@@ -249,8 +249,8 @@ public class DoctorsRestControllerTest {
 
     @Test
     public void shouldNotAppointPetToWrongSchedule() throws Exception {
-        Integer doctorId = doctorRepository.save(new Doctor(1, "Ivan Ivanov", Collections.singletonList("surgeon"))).getId();
-        Integer petId = petRepository.save(new Pet(null, null, "Tom", "Cat", 2, "Vasya")).getId();
+        Integer doctorId = doctorRepository.save(new Doctor(1, "Ivan Ivanov", "surgeon")).getId();
+        Integer petId = petRepository.save(new Pet(null, "Tom", "Cat", 2, "Vasya")).getId();
 
         mockMvc.perform(post("/doctors/{id}/schedule/2010-01-01/1000", doctorId)
                 .contentType("application/json")
@@ -261,7 +261,7 @@ public class DoctorsRestControllerTest {
 
     @Test
     public void shouldNotAppointPetIfScheduleIsBusy() throws Exception {
-        Integer doctorId = doctorRepository.save(new Doctor(1, "Ivan Ivanov", Collections.singletonList("surgeon"))).getId();
+        Integer doctorId = doctorRepository.save(new Doctor(1, "Ivan Ivanov", "surgeon")).getId();
         Integer catId = 1;
         Integer mouseId = 2;
 
