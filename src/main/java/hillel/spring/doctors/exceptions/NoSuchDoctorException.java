@@ -9,6 +9,6 @@ public class NoSuchDoctorException extends RuntimeException {
 
     public NoSuchDoctorException(Integer fromDoctorId) {
 
-        super("No such doctor" + fromDoctorId);
+        super("No such doctor" +  fromDoctorId);
     }
 }

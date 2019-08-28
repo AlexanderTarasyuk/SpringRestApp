@@ -10,8 +10,9 @@ import java.util.Map;
 @Entity
 public class Appointment {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
+
     private Integer version;
     @ElementCollection(fetch = FetchType.EAGER)
     private Map<Integer, Integer> hourToPetId = new HashMap<>();
