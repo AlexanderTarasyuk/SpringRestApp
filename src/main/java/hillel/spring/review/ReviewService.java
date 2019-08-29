@@ -25,10 +25,10 @@ public class ReviewService {
     private final MedicalCardRepository medicalCardRepository;
 
     public Review save(Integer doctorId, Review toModel) {
-        if (doctorId!=toModel.getDoctorId()){
+        if (doctorId != toModel.getDoctorId()) {
             throw new DoctorIdMismatchException(doctorId);
         }
-        if (doctorService.findById(doctorId).isEmpty()){
+        if (doctorService.findById(doctorId).isEmpty()) {
             throw new NoSuchDoctorException(doctorId);
         }
         if (medicalCardRepository.findByRecordsId(toModel.getMedicalRecordId()).isEmpty()) {
@@ -42,25 +42,35 @@ public class ReviewService {
     }
 
     public ReviewOutputDto findReviews(Integer doctorId) {
-        if (doctorService.findById(doctorId).isEmpty()){
+        if (doctorService.findById(doctorId).isEmpty()) {
             throw new NoSuchDoctorException(doctorId);
         }
         List<Review> reviews = reviewRepository.findByDoctorId(doctorId);
         ReviewOutputDto reviewOutputDto = new ReviewOutputDto();
-       reviewOutputDto.setAverageEquipmentStars(reviews.stream().collect(Collectors.averagingDouble(review-> review.getEquipmentsStars().get())));
-        reviewOutputDto.setAverageQualificationStars(reviews.stream().collect(Collectors.averagingDouble(review-> review.getQualificationsStars().get())));
-        reviewOutputDto.setAverageServiceStars(reviews.stream().collect(Collectors.averagingDouble(review-> review.getServiceStars().get())));
-        reviewOutputDto.setAverageTreatmentResultsStars(reviews.stream().collect(Collectors.averagingDouble(review-> review.getTreatmentStars().get())));
-        reviewOutputDto.setAverageGeneralStars(reviews.stream().collect(Collectors.averagingDouble(review-> review.getGeneralStars().get())));
+        reviewOutputDto.setAverageEquipmentStars(reviews.stream()
+                .filter(review -> review.getEquipmentsStars().isPresent())
+                .collect(Collectors.averagingDouble(review -> review.getEquipmentsStars().get())));
+        reviewOutputDto.setAverageQualificationStars(reviews.stream()
+                .filter(review -> review.getQualificationsStars().isPresent())
+                .collect(Collectors.averagingDouble(review -> review.getQualificationsStars().get())));
+        reviewOutputDto.setAverageServiceStars(reviews.stream()
+                .filter(review -> review.getServiceStars().isPresent())
+                .collect(Collectors.averagingDouble(review -> review.getServiceStars().get())));
+        reviewOutputDto.setAverageTreatmentResultsStars(reviews.stream()
+                .filter(review -> review.getTreatmentStars().isPresent())
+                .collect(Collectors.averagingDouble(review -> review.getTreatmentStars().get())));
+        reviewOutputDto.setAverageGeneralStars(reviews.stream()
+                .filter(review -> review.getGeneralStars().isPresent())
+                .collect(Collectors.averagingDouble(review -> review.getGeneralStars().get())));
         reviewOutputDto.setComments(reviews
                 .stream()
-                .map(review->new Comment(review.getCreationTime(), review.getComments().orElse("there is no comment")))
+                .map(review -> new Comment(review.getCreationTime(), review.getComments().orElse("there is no comment")))
                 .collect(Collectors.toList()));
         return reviewOutputDto;
     }
 
     public void update(Integer doctorId, Review review) {
-        if (reviewRepository.existsById(review.getId())){
+        if (reviewRepository.existsById(review.getId())) {
             save(doctorId, review);
         } else {
             throw new NoSuchReviewException();
