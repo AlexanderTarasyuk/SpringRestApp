@@ -12,7 +12,7 @@ public class Appointment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-
+    @Version
     private Integer version;
     @ElementCollection(fetch = FetchType.EAGER)
     private Map<Integer, Integer> hourToPetId = new HashMap<>();

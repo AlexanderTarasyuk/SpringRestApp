@@ -12,8 +12,10 @@ import hillel.spring.review.exceptions.NoSuchReviewException;
 import hillel.spring.review.model.Review;
 import hillel.spring.review.utils.Utils;
 import lombok.AllArgsConstructor;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.LockModeType;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -69,6 +71,7 @@ public class ReviewService {
         return reviewOutputDto;
     }
 
+    @Lock(value= LockModeType.OPTIMISTIC)
     public void update(Integer doctorId, Review review) {
         if (reviewRepository.existsById(review.getId())) {
             save(doctorId, review);
