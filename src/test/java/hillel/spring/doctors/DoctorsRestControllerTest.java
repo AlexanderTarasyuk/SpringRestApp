@@ -101,12 +101,12 @@ public class DoctorsRestControllerTest {
         mockMvc.perform(get("/doctors"))
                 .andExpect(status().isOk())
                 .andExpect(content().json(fromResource("hillel/spring/doctors/all-doctors.json"), false))
-                .andExpect(jsonPath("$[0].name", is("Amosov")))
-                .andExpect(jsonPath("$[1].name", is("Pirogovskiy")))
-                .andExpect(jsonPath("$[2].name", is("Sklifasovskiy")))
-                .andExpect(jsonPath("$[0].specializations[0]", is("cardiologist")))
-                .andExpect(jsonPath("$[1].specializations[0]", is("surgeon")))
-                .andExpect(jsonPath("$[2].specializations[0]", is("surgeon")));
+                .andExpect(jsonPath("$.content[0].name", is("Amosov")))
+                .andExpect(jsonPath("$[1]content.name", is("Pirogovskiy")))
+                .andExpect(jsonPath("$[2]content.name", is("Sklifasovskiy")))
+                .andExpect(jsonPath("$[0]content.specializations[0]", is("cardiologist")))
+                .andExpect(jsonPath("$[1]content.specializations[0]", is("surgeon")))
+                .andExpect(jsonPath("$[2]content.specializations[0]", is("surgeon")));
 
     }
 
@@ -126,8 +126,8 @@ public class DoctorsRestControllerTest {
         mockMvc.perform(get("/doctors")
                 .param("specialization", "surgeon"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].specializations[0]", is("surgeon")))
-                .andExpect(jsonPath("$[1].specializations[0]", is("surgeon")));
+                .andExpect(jsonPath("$content[0].specializations[0]", is("surgeon")))
+                .andExpect(jsonPath("$content[1].specializations[0]", is("surgeon")));
 
     }
 
@@ -139,7 +139,7 @@ public class DoctorsRestControllerTest {
         mockMvc.perform(get("/doctors")
                 .param("letter", "A"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].name", startsWith("A")));
+                .andExpect(jsonPath("$content[0].name", startsWith("A")));
 
     }
 
@@ -153,9 +153,9 @@ public class DoctorsRestControllerTest {
                 .param("letter", "A")
                 .param("specialization", "cardiologist"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(1)))
-                .andExpect(jsonPath("$[0].name", is("Amosov")))
-                .andExpect(jsonPath("$[0].specializations[0]", is("cardiologist")));
+                .andExpect(jsonPath("$content", hasSize(1)))
+                .andExpect(jsonPath("$[0]content.name", is("Amosov")))
+                .andExpect(jsonPath("$[0]content.specializations[0]", is("cardiologist")));
     }
 
 
@@ -186,7 +186,7 @@ public class DoctorsRestControllerTest {
         mockMvc.perform(get("/doctors")
                 .param("letter", "AMOS"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", Matchers.hasSize(1)));
+                .andExpect(jsonPath("$content", Matchers.hasSize(1)));
     }
 
     @Test
@@ -196,9 +196,9 @@ public class DoctorsRestControllerTest {
                 .param("letter", "AM")
                 .param("specialization", "cardiologist"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", Matchers.hasSize(1)))
-                .andExpect(jsonPath("$[0].name", is("Amosov")))
-                .andExpect(jsonPath("$[0].specializations[0]", is("cardiologist")));
+                .andExpect(jsonPath("$content", Matchers.hasSize(1)))
+                .andExpect(jsonPath("$content[0].name", is("Amosov")))
+                .andExpect(jsonPath("$content[0].specializations[0]", is("cardiologist")));
     }
 
     @Test
@@ -231,7 +231,7 @@ public class DoctorsRestControllerTest {
         doctorRepository.save(doctor);
 
         mockMvc.perform(get("/doctors/{id}/schedule/2010-01-01", doctorId))
-                .andExpect(jsonPath("$.hourToPetId.10", is(petId)));
+                .andExpect(jsonPath("$content.hourToPetId.10", is(petId)));
     }
 
     @Test

@@ -12,6 +12,8 @@ import hillel.spring.pet.PetService;
 import lombok.val;
 import org.hibernate.StaleObjectStateException;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,7 +41,6 @@ public class DoctorService {
 
 
     public Doctor createDoctor(Doctor doctor) {
-        checkSpecialization(doctor);
         return doctorRepository.save(doctor);
     }
 
@@ -48,7 +49,6 @@ public class DoctorService {
     }
 
     public void update(Doctor doctor) {
-        checkSpecialization(doctor);
         if (doctorRepository.existsById(doctor.getId()))
             doctorRepository.save(doctor);
         else
@@ -64,17 +64,17 @@ public class DoctorService {
     }
 
 
-    public List<Doctor> findAll(Optional<String> letter, Optional<String> specialization) {
+    public Page<Doctor> findAll(Optional<String> letter, Optional <List<String>> specialization, Pageable pageable) {
         if (specialization.isPresent() && letter.isPresent()) {
-            return doctorRepository.findBySpecializationInAndNameIgnoreCaseStartingWith(specialization.get(), letter.get());
+            return doctorRepository.findBySpecializationInAndNameIgnoreCaseStartingWith(specialization.get(), letter.get(), pageable);
         }
         if (specialization.isPresent()) {
-            return doctorRepository.findBySpecializationIn(specialization.get());
+            return doctorRepository.findBySpecializationIn(specialization.get(), pageable);
         }
         if (letter.isPresent()) {
-            return doctorRepository.findByNameIgnoreCaseStartingWith(letter.get());
+            return doctorRepository.findByLetterIgnoreCaseStartingWith(letter.get(), pageable);
         }
-        return doctorRepository.findAll();
+        return (Page<Doctor>) doctorRepository.findAll();
     }
 
 
@@ -110,25 +110,6 @@ public class DoctorService {
         }
     }
 
-    private void checkSpecialization(Doctor doctor) {
-//        Optional<String> maybeInvalid = doctor.getSpecialization().stream()
-//                .filter(s -> !specializations.contains(s))
-//                .findFirst();
-//
-//        if (maybeInvalid.isPresent()) {
-//            throw new InvalidSpecializationException(maybeInvalid.get());
-//        }
-    }
-
-
-    private Predicate<Doctor> filterByName(String letter) {
-        return doctor -> doctor.getName().toLowerCase().startsWith(letter.toLowerCase());
-    }
-
-    private Predicate<Doctor> filterBySpecialization(String specialization) {
-        return doctor -> doctor.getSpecialization().equals(specialization);
-    }
-
 
     @Transactional
     public void moveAppointment(LocalDate date, Integer fromDoctorId, Integer toDoctorId) {
@@ -159,5 +140,15 @@ public class DoctorService {
 
         doctorRepository.save(toDoctor);
         doctorRepository.save(fromDoctor);
+    }
+
+
+
+    private Predicate<Doctor> filterByName(String letter) {
+        return doctor -> doctor.getName().toLowerCase().startsWith(letter.toLowerCase());
+    }
+
+    private Predicate<Doctor> filterBySpecialization(String specialization) {
+        return doctor -> doctor.getSpecialization().equals(specialization);
     }
 }
