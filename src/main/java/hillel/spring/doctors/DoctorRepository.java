@@ -2,20 +2,23 @@ package hillel.spring.doctors;
 
 
 import hillel.spring.doctors.model.Doctor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.util.Collection;
 import java.util.List;
 
 @Repository
 public interface DoctorRepository extends JpaRepository<Doctor, Integer> {
 
-    List<Doctor> findBySpecializationInAndNameIgnoreCaseStartingWith(String strings, String s);
+    Page<Doctor> findBySpecializationInAndNameIgnoreCaseStartingWith(List<String> specialization,
+                                                                     String name,
+                                                                     Pageable pageable);
 
-    List<Doctor> findBySpecializationIn(String strings);
+    Page<Doctor> findBySpecializationIn(List<String> strings, Pageable pageable);
 
-    List<Doctor> findByNameIgnoreCaseStartingWith(String s);
+    Page<Doctor> findByLetterIgnoreCaseStartingWith(String name, Pageable pageable);
+
+
 }

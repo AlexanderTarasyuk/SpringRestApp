@@ -11,13 +11,17 @@ import hillel.spring.pet.NoSuchPetException;
 import lombok.AllArgsConstructor;
 import org.hibernate.StaleObjectStateException;
 import org.mapstruct.factory.Mappers;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.retry.annotation.Retryable;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import javax.validation.Valid;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -43,11 +47,12 @@ public class DoctorsRestController {
     }
 
     @GetMapping("/doctors")
-    public List<Doctor> findAllDoctors(
+    public Page<Doctor> findAllDoctors(
             @RequestParam(value = "letter") Optional<String> letter,
-            @RequestParam(value = "specialization") Optional<String> specialization) {
+            @RequestParam(value = "specialization") Optional <List<String>> specialization,
+            Pageable pageable) {
 
-        return service.findAll(letter, specialization);
+        return service.findAll(letter, specialization, pageable);
     }
 
     @GetMapping("/doctors/{doctorId}/schedule/{date}")
@@ -70,7 +75,7 @@ public class DoctorsRestController {
 
     //put methods
     @PutMapping("/doctors/{id}")
-    public ResponseEntity<?> updateDoctor(@RequestBody DoctorInputDto doctorInputDto, @PathVariable Integer id) {
+    public ResponseEntity<?> updateDoctor(@Valid @RequestBody DoctorInputDto doctorInputDto, @PathVariable Integer id) {
         Doctor doctor = dtoConverter.toModel(doctorInputDto, id);
         service.update(doctor);
         return ResponseEntity.noContent().build();
@@ -89,7 +94,7 @@ public class DoctorsRestController {
     }
 
     @PostMapping("/doctors")
-    public ResponseEntity<?> createDoctor(@RequestBody DoctorInputDto doctorDto) {
+    public ResponseEntity<?> createDoctor(@Valid @RequestBody DoctorInputDto doctorDto) {
 
         Doctor created = service.createDoctor(dtoConverter.toModel(doctorDto));
         return ResponseEntity.created(uriBuilder.build(created.getId())).build();
