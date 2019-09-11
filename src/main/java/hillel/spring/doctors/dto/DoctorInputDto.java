@@ -10,10 +10,10 @@ import java.util.List;
 
 @Data
 public class DoctorInputDto {
-    @NotNull
     @NotEmpty
     private String name;
-    @NotNull
     @NotEmpty
     private List <@ValidSpecialization String> specialization;
+    @NotEmpty
+    private final String diplomNumber;
 }

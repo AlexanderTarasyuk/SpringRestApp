@@ -4,6 +4,7 @@ import hillel.spring.doctors.fakeDatabase.DatabaseDoctor;
 import hillel.spring.greeting.database.Database;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -29,6 +30,11 @@ public class Config {
     @Bean
     public DatabaseDoctor getDatabaseDoctor() {
         return new DatabaseDoctor();
+    }
+
+    @Bean
+    public RestTemplate getRestTemplate() {
+        return new RestTemplate();
     }
 
 }

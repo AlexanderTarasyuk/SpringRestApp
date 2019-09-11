@@ -2,3 +2,6 @@ spring:
   datasource:
     driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
     url: jdbc:tc:postgresql://localhost/postgres
+
+    pet-clinic:
+      diploma-url: "http://localhost:8089"
