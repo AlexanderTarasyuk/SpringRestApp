@@ -1,25 +1,28 @@
 package hillel.spring.doctors;
 
 
+import hillel.spring.doctors.configuration.DoctorServiceConfig;
 import hillel.spring.doctors.dto.DoctorInputDto;
 import hillel.spring.doctors.dto.DoctorsDtoMapper;
 import hillel.spring.doctors.exceptions.*;
 import hillel.spring.doctors.model.Appointment;
+import hillel.spring.doctors.model.Diplom;
 import hillel.spring.doctors.model.Doctor;
 import hillel.spring.doctors.model.PetId;
 import hillel.spring.pet.NoSuchPetException;
 import lombok.AllArgsConstructor;
-import org.hibernate.StaleObjectStateException;
+import lombok.val;
 import org.mapstruct.factory.Mappers;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.retry.annotation.Retryable;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
+import lombok.extern.slf4j.Slf4j;
+
 
 import javax.validation.Valid;
 import java.time.LocalDate;
@@ -28,6 +31,7 @@ import java.util.Optional;
 
 @RestController
 @AllArgsConstructor
+@Slf4j
 public class DoctorsRestController {
 
     private final DoctorService service;
@@ -36,6 +40,10 @@ public class DoctorsRestController {
             .scheme("http")
             .host("localhost")
             .path("/doctors/{id}");
+
+    private final RestTemplate restTemplate;
+
+    private final DoctorServiceConfig doctorServiceConfig ;
 
 
     //get methods
@@ -96,8 +104,17 @@ public class DoctorsRestController {
     @PostMapping("/doctors")
     public ResponseEntity<?> createDoctor(@Valid @RequestBody DoctorInputDto doctorDto) {
 
-        Doctor created = service.createDoctor(dtoConverter.toModel(doctorDto));
-        return ResponseEntity.created(uriBuilder.build(created.getId())).build();
+        try {
+            log.debug("Asking for diplom service");
+            String urlDiplomService = doctorServiceConfig.getDiplomUrl() + "/diplom/" + doctorDto.getDiplomNumber();
+            log.debug("Dimplom service URL: {}", urlDiplomService);
+            Diplom diplom = restTemplate.getForObject(urlDiplomService, Diplom.class);
+            val created = service.createDoctor(dtoConverter.toModel(doctorDto), diplom);
+            return ResponseEntity.created(uriBuilder.build(created.getId())).build();
+        } catch (Exception e) {
+            log.error("Asking for  to diploma service finished with exception", e);
+        }
+        return null;
 
     }
 

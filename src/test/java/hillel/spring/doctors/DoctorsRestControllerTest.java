@@ -1,5 +1,7 @@
 package hillel.spring.doctors;
 
+import com.github.tomakehurst.wiremock.client.WireMock;
+import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import hillel.spring.doctors.model.Appointment;
 import hillel.spring.doctors.model.Doctor;
 import hillel.spring.pet.Pet;
@@ -7,6 +9,7 @@ import hillel.spring.pet.PetRepository;
 import org.hamcrest.Matchers;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +21,7 @@ import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ResourceUtils;
 
@@ -25,7 +29,9 @@ import java.io.File;
 import java.nio.file.Files;
 import java.time.LocalDate;
 import java.util.Collections;
+import java.util.Optional;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
@@ -49,9 +55,10 @@ public class DoctorsRestControllerTest {
     @Autowired
     DoctorService doctorService;
 
+    @Rule
+    public WireMockRule wireMockRule = new WireMockRule(8089);
+
     @Before
-    @Rollback
-    @Transactional
     public void init() {
 
         doctorRepository.save(new Doctor(1, "Amosov","cardiologist"));
@@ -80,9 +87,13 @@ public class DoctorsRestControllerTest {
 
     @Test
     public void shouldCreateDoctor() throws Exception {
-        MockHttpServletResponse response = mockMvc.perform(post("/doctors")
+        WireMock.stubFor(WireMock.get("/diplom/111111")
+                .willReturn(okJson(fromResource("petclinic/doctor/diplom.json"))));
+
+        MockHttpServletResponse response = mockMvc.perform(MockMvcRequestBuilders.post("/doctors")
                 .contentType("application/json")
-                .content(fromResource("hillel/spring/doctors/create-doctor.json")))
+                .content(fromResource("petclinic/doctor/create-doctor.json"))
+        )
                 .andExpect(status().isCreated())
                 .andExpect(header().string("location", containsString("http://localhost/doctors/")))
                 .andReturn().getResponse();
@@ -90,8 +101,9 @@ public class DoctorsRestControllerTest {
         Integer id = Integer.parseInt(response.getHeader("location")
                 .replace("http://localhost/doctors/", ""));
 
-        assertThat(doctorRepository.findById(id)).isPresent();
-
+        Optional<Doctor> optionalDoctor = doctorRepository.findById(id);
+        assertThat(optionalDoctor).isPresent();
+        assertThat(optionalDoctor.get().getDiplom().getDateOfGraduation()).isEqualTo(1996);
 
     }
 

@@ -20,6 +20,7 @@ public class Doctor {
     @Version
     private Integer versionId;
     private String name;
+    private String numberOfDiplom;
 
     @ElementCollection(fetch = FetchType.EAGER)
     private List<String> specialization;
@@ -27,6 +28,8 @@ public class Doctor {
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private Map<LocalDate, Appointment> scheduleToDate;
 
+    @Embedded
+    private Diplom diplom;
 
 
     public Doctor(Integer id, String name, String...specialization) {

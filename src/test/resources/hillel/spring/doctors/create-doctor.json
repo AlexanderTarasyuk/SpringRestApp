@@ -2,5 +2,7 @@
     "name": "House",
     "specialization": [
       "surgeon"
-    ]
+    ],
+
+    "diplomNumber" : "111111"
   }

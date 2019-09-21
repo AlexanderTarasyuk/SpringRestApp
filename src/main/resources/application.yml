@@ -10,6 +10,9 @@ doctors:
     -cardiologist
 
 spring:
+  logging:
+    level:
+      sql: true
 
   flyway:
     baselineOnMigrate: true
@@ -33,6 +36,15 @@ spring:
     password: postgres
 hibernate:
   dialect: org.hibernate.dialect.PostgreSQLDialect
+pet-clinic:
+  host-name: my-pet.com
+  name: Aibolit
+  working-hours:
+    start:  8AM
+    end: 5PM
+  doctors-specializations:  surgeon, veterinarian, therapeutist
+  doctor-url:  "http://localhost:8081"
+  diploma-url: "http://localhost:8081"
 
 
 

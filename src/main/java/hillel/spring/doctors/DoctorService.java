@@ -5,10 +5,12 @@ import hillel.spring.doctors.exceptions.InvalidSpecializationException;
 import hillel.spring.doctors.exceptions.NoSuchDoctorException;
 import hillel.spring.doctors.exceptions.ScheduleIsAlreadyBusy;
 import hillel.spring.doctors.model.Appointment;
+import hillel.spring.doctors.model.Diplom;
 import hillel.spring.doctors.model.Doctor;
 import hillel.spring.pet.NoSuchPetException;
 import hillel.spring.pet.Pet;
 import hillel.spring.pet.PetService;
+import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.hibernate.StaleObjectStateException;
 import org.springframework.beans.factory.annotation.Value;
@@ -24,12 +26,14 @@ import java.util.Optional;
 import java.util.function.Predicate;
 
 @Service
+@Slf4j
 
 public class DoctorService {
     private final DoctorRepository doctorRepository;
     private final List<String> specializations;
 
     private final PetService petService;
+    private static String LOG = DoctorService.class.getCanonicalName();
 
     public DoctorService(@Value("${doctors.specializations}") String[] specializations,
                          DoctorRepository doctorRepository,
@@ -37,10 +41,15 @@ public class DoctorService {
         this.specializations = List.of(specializations);
         this.doctorRepository = doctorRepository;
         this.petService = petService;
+
     }
 
 
-    public Doctor createDoctor(Doctor doctor) {
+    public Doctor createDoctor(Doctor doctor, Diplom diplom) {
+
+        log.debug(LOG, "creating doctor");
+        doctor.setDiplom(diplom);
+        log.debug(LOG, " doctor is created");
         return doctorRepository.save(doctor);
     }
 
@@ -49,29 +58,42 @@ public class DoctorService {
     }
 
     public void update(Doctor doctor) {
-        if (doctorRepository.existsById(doctor.getId()))
+        log.debug(LOG, "updating doctor with id: " +doctor.getId());
+
+        if (doctorRepository.existsById(doctor.getId())) {
             doctorRepository.save(doctor);
-        else
+        } else {
             throw new NoSuchDoctorException();
+        }
+        log.debug(LOG, "updated doctor with id: " +doctor.getId());
+
     }
 
     public boolean delete(Integer id) {
+
+        log.debug(LOG, "deleting doctor with id: "+ id);
+
         if (doctorRepository.existsById(id)) {
             doctorRepository.deleteById(id);
+            log.debug(LOG, "deleted doctor with id: "+ id);
             return true;
         }
+        log.debug(LOG, "not deleted doctor with id: "+ id);
         return false;
     }
 
 
-    public Page<Doctor> findAll(Optional<String> letter, Optional <List<String>> specialization, Pageable pageable) {
+    public Page<Doctor> findAll(Optional<String> letter, Optional<List<String>> specialization, Pageable pageable) {
         if (specialization.isPresent() && letter.isPresent()) {
+            log.debug(LOG, " doctor is found with letter and specialization: "+ letter +" " + specialization);
             return doctorRepository.findBySpecializationInAndNameIgnoreCaseStartingWith(specialization.get(), letter.get(), pageable);
         }
         if (specialization.isPresent()) {
+            log.debug(LOG, " doctor is found  with specialization: " +" " + specialization);
             return doctorRepository.findBySpecializationIn(specialization.get(), pageable);
         }
         if (letter.isPresent()) {
+            log.debug(LOG, " doctor is found with letter : "+ letter);
             return doctorRepository.findByLetterIgnoreCaseStartingWith(letter.get(), pageable);
         }
         return (Page<Doctor>) doctorRepository.findAll();
@@ -79,9 +101,11 @@ public class DoctorService {
 
 
     public Appointment findOrCreateSchedule(Integer doctorId, LocalDate date) {
+
+        log.debug(LOG, "finding or creating schedule" );
         val mayBeDoctor = findById(doctorId);
         Doctor doctor = mayBeDoctor.orElseThrow(NoSuchDoctorException::new);
-
+        log.debug(LOG, "found or created schedule" );
         return doctor.getScheduleToDate().computeIfAbsent(date, k -> new Appointment());
     }
 
@@ -141,7 +165,6 @@ public class DoctorService {
         doctorRepository.save(toDoctor);
         doctorRepository.save(fromDoctor);
     }
-
 
 
     private Predicate<Doctor> filterByName(String letter) {
