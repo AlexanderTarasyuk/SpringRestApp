@@ -143,11 +143,11 @@ public class DoctorService {
         Optional<Doctor> toMaybeDoctor = doctorRepository.findById(toDoctorId);
         if (toMaybeDoctor.isEmpty())
             throw new NoSuchDoctorException(toDoctorId);
-        Doctor fromDoctor = fromMaybeDoctor.get();
-        Doctor toDoctor = toMaybeDoctor.get();
+        var fromDoctor = fromMaybeDoctor.get();
+        var toDoctor = toMaybeDoctor.get();
 
-        Appointment scheduleFrom = fromDoctor.getScheduleToDate().get(date);
-        Appointment scheduleTo = findOrCreateSchedule(toDoctor.getId(), date);
+        var scheduleFrom = fromDoctor.getScheduleToDate().get(date);
+        var scheduleTo = findOrCreateSchedule(toDoctor.getId(), date);
 
         Optional<Integer> mayBeBusyHour = scheduleFrom.getHourToPetId()
                 .keySet()

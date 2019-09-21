@@ -88,8 +88,6 @@ public class HelloServiceTest {
                 .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
 
 
-        for (Map.Entry<String, Long> entry : greetingsCountMap.entrySet()) {
-            Assertions.assertThat(entry.getValue()).isCloseTo(valueToExpect, Percentage.withPercentage(2.0));
-        }
+        greetingsCountMap.forEach((key, value) -> assertThat(value).isCloseTo(valueToExpect, Percentage.withPercentage(2.0)));
     }
 }
